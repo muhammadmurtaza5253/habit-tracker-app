@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AppTextStyles {
-  static const TextStyle headline = TextStyle(
+  static final TextStyle headline = GoogleFonts.poppins(
     color: AppColors.textPrimary,
     fontSize: 24,
     fontWeight: FontWeight.bold,
   );
 
-  static const TextStyle body = TextStyle(
-    color: AppColors.textSecondary, // Lighter text color for body content
+  static final TextStyle body = GoogleFonts.poppins(
+    color: AppColors.textSecondary,
     fontSize: 16,
   );
 
-  static const TextStyle dropdown = TextStyle(
+  static final TextStyle dropdown = GoogleFonts.poppins(
     color: AppColors.textPrimary,
     fontSize: 16,
   );

@@ -1,11 +1,9 @@
-
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:habit_tracker_app/add_habit_page.dart';
-import 'package:habit_tracker_app/homepage.dart';
-import 'package:habit_tracker_app/image_urls.dart';
+import 'package:habit_tracker_app/screens/add_habit_page.dart';
+import 'package:habit_tracker_app/screens/homepage.dart';
+import 'package:habit_tracker_app/utils/image_urls.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -50,7 +48,7 @@ class _SplashScreenState extends State<SplashScreen>
         child: FadeTransition(
           opacity: _animation,
           child: Image.asset(
-            ImageUrls.appLogo, 
+            ImageUrls.appLogo,
             width: 150,
             height: 150,
           ),
