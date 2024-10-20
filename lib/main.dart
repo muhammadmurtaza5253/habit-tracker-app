@@ -37,6 +37,6 @@ class MyApp extends StatelessWidget {
             textStyle: TextStyle(color: AppColors.textPrimary),
           ),
         ),
-        home: ViewHabitsPage());
+        home: const SplashScreen());
   }
 }

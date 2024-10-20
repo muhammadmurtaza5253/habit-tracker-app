@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:habit_tracker_app/screens/add_habit_page.dart';
 import 'package:habit_tracker_app/screens/homepage.dart';
+import 'package:habit_tracker_app/screens/view_habits_page.dart';
 import 'package:habit_tracker_app/utils/image_urls.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -30,7 +31,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     Timer(const Duration(seconds: 3), () {
       Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => AddHabitPage()));
+          MaterialPageRoute(builder: (context) => const ViewHabitsPage()));
     });
   }
 
