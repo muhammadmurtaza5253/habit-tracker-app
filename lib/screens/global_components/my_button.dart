@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker_app/screens/global_components/my_circular_progress.dart';
 import 'package:habit_tracker_app/utils/app_colors.dart'; // Import your colors
 import 'package:habit_tracker_app/utils/app_text_styles.dart'; // Import your text styles
 
@@ -37,9 +38,7 @@ class _MyButtonState extends State<MyButton> {
           shadowColor: AppColors.primary.withOpacity(0.4),
         ),
         child: widget.isLoading
-            ? const CircularProgressIndicator(
-                color: Colors.white,
-              )
+            ? MyCircularProgress(diameter: 15, strokeWidth: 2, color: AppColors.accent,)
             : Text(
                 widget.buttonText,
                 style: AppTextStyles.body.copyWith(

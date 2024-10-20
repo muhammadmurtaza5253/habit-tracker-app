@@ -57,6 +57,7 @@ class DatabaseHelper {
         .split('-')
         .reversed
         .join('/');
+    // String formattedDate = '10/10/2024';
 
     // Add the 'add_date' to the row
     row['add_date'] = formattedDate;
@@ -69,6 +70,32 @@ class DatabaseHelper {
   Future<List<Map<String, dynamic>>> queryAll() async {
     Database db = await database;
     return await db.query('habit_table');
+  }
+
+  Future<List<Map<String, dynamic>>> queryOldHabitsWithUnpaidPenalties() async {
+    Database db = await database;
+
+    // Get the current date
+    DateTime now = DateTime.now();
+
+    // Calculate the start of the current week (assuming week starts on Monday)
+    DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+
+    // Format dates to match the 'add_date' format in the database (dd/mm/yyyy)
+    String formattedStartOfWeek = startOfWeek
+        .toLocal()
+        .toString()
+        .split(' ')[0]
+        .split('-')
+        .reversed
+        .join('/');
+
+    // Query habits that are not from the current week and have penalty_paid = 0
+    return await db.query(
+      'habit_table',
+      where: 'add_date < ? AND penalty_paid = ?',
+      whereArgs: [formattedStartOfWeek, 0],
+    );
   }
 
   Future<List<Map<String, dynamic>>> queryLastWeekHabits() async {
@@ -107,6 +134,23 @@ class DatabaseHelper {
         .update('habit_table', row, where: 'id = ?', whereArgs: [id]);
   }
 
+  Future<int> updatePenalty(int id) async {
+    Database db = await database;
+
+    // Define the update map
+    Map<String, dynamic> updatedData = {
+      'penalty_paid': 1, // Update penaltyPaid to 1
+    };
+
+    // Perform the update where the habit's ID matches the provided ID
+    return await db.update(
+      'habit_table',
+      updatedData,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
   // Delete a record
   Future<int> delete(int? id) async {
     Database db = await database;
@@ -114,6 +158,27 @@ class DatabaseHelper {
       return await db.delete('habit_table', where: 'id = ?', whereArgs: [id]);
     }
     return 0;
+  }
+
+  Future<void> cleanOldHabits() async {
+    Database db = await database;
+
+    // Get the date from one week ago in the same format
+    String sevenDaysAgo = DateTime.now()
+        .subtract(const Duration(days: 7))
+        .toLocal()
+        .toString()
+        .split(' ')[0]
+        .split('-')
+        .reversed
+        .join('/');
+
+    // Delete habits older than one week with penalty_paid = 1
+    await db.delete(
+      'habit_table',
+      where: 'add_date < ? AND penalty_paid = ?',
+      whereArgs: [sevenDaysAgo, 1],
+    );
   }
 
   // Close the database

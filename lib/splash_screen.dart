@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:habit_tracker_app/logic/database_helper.dart';
 import 'package:habit_tracker_app/screens/add_habit_page.dart';
 import 'package:habit_tracker_app/screens/homepage.dart';
 import 'package:habit_tracker_app/screens/view_habits_page.dart';
@@ -18,9 +19,16 @@ class _SplashScreenState extends State<SplashScreen>
   late AnimationController _controller;
   late Animation<double> _animation;
 
+  Future<void> cleanDatabase() async {
+    print('cleaning the database with old habits...');
+    await DatabaseHelper().cleanOldHabits();
+  }
+
   @override
   void initState() {
     super.initState();
+
+    cleanDatabase();
 
     _controller = AnimationController(
       duration: const Duration(seconds: 2),

@@ -21,10 +21,6 @@ class _AddHabitPageState extends State<AddHabitPage> {
 
   bool isLoading = false;
 
-  /* This is related to dropdown which has been commented currently */
-  // String _selectedFrequency = '3 Days';
-  // final List<String> _frequencyOptions = ['3 Days', 'Week', 'Month', 'Year'];
-
   void insertHabit(BuildContext context) async {
     setState(() {
       isLoading = true;
@@ -42,7 +38,7 @@ class _AddHabitPageState extends State<AddHabitPage> {
       };
 
       await DatabaseHelper().insert(habitData);
-      await Future.delayed(const Duration(seconds: 2));
+      await Future.delayed(const Duration(seconds: 1));
 
       _habitNameController.clear();
       _descriptionController.clear();
@@ -51,6 +47,10 @@ class _AddHabitPageState extends State<AddHabitPage> {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Habit added successfully')));
+
+        // Close the keyboard
+        FocusScope.of(context).unfocus();
+
         widget.onHabitAdded?.call(); // Call the callback here
       }
     } else {
@@ -68,100 +68,71 @@ class _AddHabitPageState extends State<AddHabitPage> {
     return Scaffold(
       appBar: const MyAppBar(),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Add a new habit',
-                  style: AppTextStyles.headline.copyWith(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
+        child: GestureDetector(
+          onTap: () {
+            // Close the keyboard when tapping outside of the text fields
+            FocusScope.of(context).unfocus();
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Add a new habit',
+                    style: AppTextStyles.headline.copyWith(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  'Try to follow it religiously for one week!',
-                  style: AppTextStyles.body.copyWith(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                  const SizedBox(height: 12),
+                  Text(
+                    'Try to follow it religiously for one week!',
+                    style: AppTextStyles.body.copyWith(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 24),
-                MyTextField(
-                  controller: _habitNameController,
-                  hintText: 'Enter Habit name',
-                  labelText: 'Habit Name',
-                ),
-                const SizedBox(height: 24),
-                // Habit Name Input
-                MyTextField(
-                  controller: _descriptionController,
-                  hintText: 'Enter Description',
-                  labelText: 'Description for your habit',
-                  lines: 3,
-                ),
-                const SizedBox(height: 24),
-                // Frequency Dropdown
-                // Text('Activity Timer',
-                //     style: AppTextStyles.body.copyWith(fontSize: 18)),
-                // const SizedBox(height: 8),
-                // DropdownButtonFormField<String>(
-                //   dropdownColor: AppColors.inputBackground,
-                //   value: _selectedFrequency,
-                //   items: _frequencyOptions.map((String value) {
-                //     return DropdownMenuItem<String>(
-                //       value: value,
-                //       child: Text(value, style: AppTextStyles.body),
-                //     );
-                //   }).toList(),
-                //   onChanged: (newValue) {
-                //     setState(() {
-                //       _selectedFrequency = newValue!;
-                //     });
-                //   },
-                //   decoration: InputDecoration(
-                //     filled: true,
-                //     fillColor: AppColors.inputBackground,
-                //     border: OutlineInputBorder(
-                //       borderRadius: BorderRadius.circular(16),
-                //       borderSide: BorderSide.none,
-                //     ),
-                //     contentPadding:
-                //         const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                //   ),
-                //   isExpanded: true, // Makes the dropdown take up the full width
-                //   icon: const Icon(Icons.arrow_drop_down,
-                //       color: AppColors.textPrimary), // Adjust dropdown arrow icon
-                //   iconSize: 24,
-                //   style: AppTextStyles.body, // Text style inside the dropdown
-                // ),
-                // const SizedBox(height: 24),
-                // Penalty Input
-                MyTextField(
-                  controller: _penaltyController,
-                  hintText: 'Enter penalty',
-                  labelText: 'Penalty for not fulfilling',
-                  lines: 3,
-                ),
-                Container(
-                  alignment: Alignment.centerRight,
-                  child: IconButton(
-                    icon: const Icon(Icons.info_outline,
-                        color: AppColors.textSecondary),
-                    onPressed: () {
-                      _showInfoDialog(context);
-                    },
+                  const SizedBox(height: 24),
+                  MyTextField(
+                    controller: _habitNameController,
+                    hintText: 'Enter Habit name',
+                    labelText: 'Habit Name',
                   ),
-                ),
-                const SizedBox(height: 32),
-                MyButton(
-                    buttonText: 'Add',
-                    onPressed: () => {insertHabit(context)},
-                    isLoading: isLoading)
-              ],
+                  const SizedBox(height: 24),
+                  // Habit Name Input
+                  MyTextField(
+                    controller: _descriptionController,
+                    hintText: 'Enter Description',
+                    labelText: 'Description for your habit',
+                    lines: 3,
+                  ),
+                  const SizedBox(height: 24),
+                  // Penalty Input
+                  MyTextField(
+                    controller: _penaltyController,
+                    hintText: 'Enter penalty',
+                    labelText: 'Penalty for not fulfilling',
+                    lines: 3,
+                  ),
+                  Container(
+                    alignment: Alignment.centerRight,
+                    child: IconButton(
+                      icon: const Icon(Icons.info_outline,
+                          color: AppColors.textSecondary),
+                      onPressed: () {
+                        _showInfoDialog(context);
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  MyButton(
+                      buttonText: 'Add',
+                      onPressed: () => {insertHabit(context)},
+                      isLoading: isLoading)
+                ],
+              ),
             ),
           ),
         ),
