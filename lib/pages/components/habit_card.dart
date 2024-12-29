@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:habit_tracker_app/logic/database_helper.dart';
-import 'package:habit_tracker_app/screens/global_components/habit_detail_dialog.dart';
+import 'package:habit_tracker_app/database_helper/database_helper.dart';
+import 'package:habit_tracker_app/pages/components/habit_detail_dialog.dart';
 import 'package:habit_tracker_app/utils/app_colors.dart'; // Import your colors
 import 'package:habit_tracker_app/utils/app_text_styles.dart'; // Import your text styles
 
@@ -27,15 +27,15 @@ class _HabitCardState extends State<HabitCard> {
     try {
       await DatabaseHelper().delete(widget.habit?['id']);
       if (widget.onDelete != null) widget.onDelete!();
-      if (context.mounted)
+      if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Habit was deleted successfully!')),
         );
+      }
     } catch (e) {
-      print('error deleting habit...$e');
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Habit was not deleted successfully!')),
+          SnackBar(content: Text('Habit was not deleted successfully! $e')),
         );
       }
     }
@@ -44,29 +44,30 @@ class _HabitCardState extends State<HabitCard> {
   @override
   Widget build(BuildContext context) {
     return Dismissible(
-      key: Key(
-          widget.habit?['id'].toString() ?? '0'), // Ensure each key is unique
+      key: Key(widget.habit?['id'].toString() ?? '0'),
       background: Container(
-        color: Colors.red, // Background color when swiping
+        color: AppColors.error,
         alignment: Alignment.centerRight,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: const Icon(Icons.delete, color: Colors.white), // Icon for delete
+        // padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: const Icon(Icons.delete, color: Colors.white),
       ),
       onDismissed: (direction) async {
-        // Perform the deletion
         deleteHabit(context);
       },
       child: GestureDetector(
         onTap: () {
-          showHabitDetailsDialog(context, widget.habit, widget.onDelete, deleteHabit: deleteHabit, isUnpaidPage: widget.isUnpaidPage, onUpdate: widget.onUpdate);
+          showHabitDetailsDialog(context, widget.habit, widget.onDelete,
+              deleteHabit: deleteHabit,
+              isUnpaidPage: widget.isUnpaidPage,
+              onUpdate: widget.onUpdate);
         },
         child: SizedBox(
-          width: double.infinity, // Set the width to full
+          width: double.infinity, 
           child: Card(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
-            color: AppColors.inputBackground,
+            color: AppColors.surface,
             elevation: 4,
             margin: const EdgeInsets.symmetric(vertical: 8), // Optional margin
             child: Padding(
@@ -94,6 +95,4 @@ class _HabitCardState extends State<HabitCard> {
       ),
     );
   }
-
-  
 }

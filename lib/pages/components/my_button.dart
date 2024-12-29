@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:habit_tracker_app/screens/global_components/my_circular_progress.dart';
+import 'package:habit_tracker_app/pages/components/my_circular_progress.dart';
 import 'package:habit_tracker_app/utils/app_colors.dart'; // Import your colors
 import 'package:habit_tracker_app/utils/app_text_styles.dart'; // Import your text styles
 
@@ -30,7 +30,7 @@ class _MyButtonState extends State<MyButton> {
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
           minimumSize: Size(MediaQuery.sizeOf(context).width, 50), // Set width dynamically
-          backgroundColor: AppColors.secondary,
+          backgroundColor: Colors.purple,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30),
           ),

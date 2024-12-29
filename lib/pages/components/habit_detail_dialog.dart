@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:habit_tracker_app/logic/database_helper.dart';
+import 'package:habit_tracker_app/database_helper/database_helper.dart';
+import 'package:habit_tracker_app/pages/components/unpaid_page_actions.dart';
 import 'package:habit_tracker_app/utils/app_colors.dart';
 import 'package:habit_tracker_app/utils/app_text_styles.dart';
+import 'package:habit_tracker_app/habit_helpers/helpers.dart';
 
 void showHabitDetailsDialog(
     BuildContext context, final Map? habit, final VoidCallback? onDelete,
@@ -11,12 +13,16 @@ void showHabitDetailsDialog(
   final TextEditingController pledgeController =
       TextEditingController(); // Controller for the pledge input
 
+  int points = Helpers()
+      .calculatePoints(habit); // Calculate points based on the habit data
+
   showDialog(
     context: context,
     builder: (BuildContext context) {
       return StatefulBuilder(
         builder: (context, setState) {
           return AlertDialog(
+            backgroundColor: AppColors.background,
             title: Text(
               habit?['name'] ?? 'No habit name',
               style: AppTextStyles.headline.copyWith(
@@ -37,11 +43,29 @@ void showHabitDetailsDialog(
                 Text(
                   'Penalty: ${habit?['penalty'] ?? 'No penalty'}',
                   style: AppTextStyles.body.copyWith(
-                    color: Colors.red,
+                    color: AppColors.error,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 16),
+                // Points Text
+                if (points > 0)
+                  Text(
+                    'For this activity, you have -${points} points.',
+                    style: AppTextStyles.body.copyWith(
+                      color: AppColors.error,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
+                else
+                  Text(
+                    'You are going good!',
+                    style: AppTextStyles.body.copyWith(
+                      color: Colors.green,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                const SizedBox(height: 16),
                 // Show pledge input if isUnpaidPage is true
                 if (isUnpaidPage) ...[
                   TextField(
@@ -68,7 +92,7 @@ void showHabitDetailsDialog(
                     ),
                     onPressed: isPledged
                         ? () async {
-                            print("updating the habit with updated penalty");
+                            print("Updating the habit with updated penalty");
                             await DatabaseHelper().updatePenalty(habit?['id']);
                             if (onUpdate != null) onUpdate();
                             Navigator.of(context).pop();
@@ -101,45 +125,23 @@ void showHabitDetailsDialog(
             actions: <Widget>[
               // Only show delete button if isUnpaidPage is false
               if (!isUnpaidPage) ...[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: isDeleting
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor:
-                                    AlwaysStoppedAnimation<Color>(Colors.red),
-                              ),
-                            )
-                          : const Icon(Icons.delete, color: Colors.red),
-                      onPressed: isDeleting
-                          ? null
-                          : () async {
-                              setState(() {
-                                isDeleting = true;
-                              });
-                              // Call the delete function here
-                              await deleteHabit(context);
-                              setState(() {
-                                isDeleting = false;
-                              });
-                              if (context.mounted) {
-                                Navigator.of(context).pop();
-                              }
-                            },
-                    ),
-                    TextButton(
-                      child: const Text('OK',
-                          style: TextStyle(color: AppColors.primary)),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
+                UnPaidPageActions(
+                  isDeleting: isDeleting,
+                  deleteHabit: (context) async {
+                    setState(() {
+                      isDeleting = true;
+                    });
+                    await deleteHabit(context);
+                    setState(() {
+                      isDeleting = false;
+                    });
+                    if (context.mounted) {
+                      Navigator.of(context).pop();
+                    }
+                  },
+                  onOkPressed: () {
+                    Navigator.of(context).pop();
+                  },
                 ),
               ],
             ],

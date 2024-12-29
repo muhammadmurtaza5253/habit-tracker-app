@@ -11,7 +11,7 @@ class AppTextStyles {
 
   static final TextStyle body = GoogleFonts.poppins(
     color: AppColors.textSecondary,
-    fontSize: 16,
+    fontSize: 14,
   );
 
   static final TextStyle dropdown = GoogleFonts.poppins(

@@ -12,16 +12,16 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: AppColors.background, // Customize as needed
-      elevation: 0, // Remove shadow if desired
-      centerTitle: true, // Center the title (logo)
+      backgroundColor: AppColors.background,
+      elevation: 0,
+      centerTitle: true, 
       title: Image.asset(
         ImageUrls.appLogo,
         width: height, 
         height: height,
         fit: BoxFit.contain,
       ),
-      automaticallyImplyLeading: false, // Remove back button if not needed
+      automaticallyImplyLeading: false, 
     );
   }
 

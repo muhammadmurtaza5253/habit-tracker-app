@@ -31,6 +31,12 @@ class DatabaseHelper {
     );
   }
 
+  Future<void> deleteDatabaseFile() async {
+    final dbPath = await getDatabasesPath();
+    final path = join(dbPath, 'habit_tracker.db');
+    await deleteDatabase(path); // Deletes the database file
+  }
+
   // Create tables in the database
   Future<void> _onCreate(Database db, int version) async {
     await db.execute('''
@@ -40,7 +46,8 @@ class DatabaseHelper {
       description TEXT NOT NULL,
       penalty TEXT NOT NULL,
       add_date TEXT NOT NULL,
-      penalty_paid INTEGER NOT NULL DEFAULT 0
+      penalty_paid INTEGER NOT NULL DEFAULT 0,
+      track_attendance TEXT NOT NULL
     )
   ''');
   }
@@ -48,8 +55,6 @@ class DatabaseHelper {
   // Insert a new record
   Future<int> insert(Map<String, dynamic> row) async {
     Database db = await database;
-
-    // Extract the current date in the format dd/mm/yyyy
     String formattedDate = DateTime.now()
         .toLocal()
         .toString()
@@ -57,12 +62,14 @@ class DatabaseHelper {
         .split('-')
         .reversed
         .join('/');
-    // String formattedDate = '10/10/2024';
 
-    // Add the 'add_date' to the row
+    // formattedDate = '05/10/2024';
+
     row['add_date'] = formattedDate;
     row['penalty_paid'] = 0;
+    row['track_attendance'] = row['track_attendance'] ?? "";
 
+    print('inserting data into database...');
     return await db.insert('habit_table', row);
   }
 
@@ -74,14 +81,8 @@ class DatabaseHelper {
 
   Future<List<Map<String, dynamic>>> queryOldHabitsWithUnpaidPenalties() async {
     Database db = await database;
-
-    // Get the current date
     DateTime now = DateTime.now();
-
-    // Calculate the start of the current week (assuming week starts on Monday)
     DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1));
-
-    // Format dates to match the 'add_date' format in the database (dd/mm/yyyy)
     String formattedStartOfWeek = startOfWeek
         .toLocal()
         .toString()
@@ -140,6 +141,28 @@ class DatabaseHelper {
     // Define the update map
     Map<String, dynamic> updatedData = {
       'penalty_paid': 1, // Update penaltyPaid to 1
+    };
+
+    // Perform the update where the habit's ID matches the provided ID
+    return await db.update(
+      'habit_table',
+      updatedData,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<int> updateDays(Map<dynamic, dynamic> habit) async {
+    Database db = await database;
+
+    // Extract the habit's ID and updated track_attendance
+    int id = habit['id'];
+    String updatedTrackAttendance = habit['track_attendance'];
+
+    // Define the update map
+    Map<String, dynamic> updatedData = {
+      'track_attendance':
+          updatedTrackAttendance, // Update track_attendance with the provided value
     };
 
     // Perform the update where the habit's ID matches the provided ID

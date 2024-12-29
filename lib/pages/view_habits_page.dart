@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:habit_tracker_app/logic/database_helper.dart';
-import 'package:habit_tracker_app/screens/add_habit_page.dart';
-import 'package:habit_tracker_app/screens/global_components/my_app_bar.dart';
-import 'package:habit_tracker_app/screens/global_components/my_circular_progress.dart';
-import 'package:habit_tracker_app/screens/global_components/no_habit_prompt.dart';
-import 'package:habit_tracker_app/screens/global_components/no_unpaid_penalty_prompt.dart';
+import 'package:habit_tracker_app/database_helper/database_helper.dart';
+import 'package:habit_tracker_app/pages/AddHabitPage/add_habit_page.dart';
+import 'package:habit_tracker_app/pages/components/my_app_bar.dart';
+import 'package:habit_tracker_app/pages/components/my_circular_progress.dart';
+import 'package:habit_tracker_app/pages/components/no_habit_prompt.dart';
+import 'package:habit_tracker_app/pages/penalty_not_paid.dart';
 import 'package:habit_tracker_app/utils/app_colors.dart';
 import 'package:habit_tracker_app/utils/app_text_styles.dart';
-import 'package:habit_tracker_app/screens/global_components/habit_card.dart';
+import 'package:habit_tracker_app/pages/components/habit_card.dart';
 
-class PenaltyNotPaidPage extends StatefulWidget {
-  const PenaltyNotPaidPage({super.key});
+class ViewHabitsPage extends StatefulWidget {
+  const ViewHabitsPage({super.key});
 
   @override
-  State<PenaltyNotPaidPage> createState() => _PenaltyNotPaidPageState();
+  State<ViewHabitsPage> createState() => _ViewHabitsPageState();
 }
 
-class _PenaltyNotPaidPageState extends State<PenaltyNotPaidPage> {
+class _ViewHabitsPageState extends State<ViewHabitsPage> {
   bool isLoading = true;
   List userHabits = [];
 
@@ -29,7 +29,7 @@ class _PenaltyNotPaidPageState extends State<PenaltyNotPaidPage> {
   Future<void> fetchHabitsFromDatabase() async {
     print('fetching habits from database...');
     final dbHelper = DatabaseHelper();
-    final habits = await dbHelper.queryOldHabitsWithUnpaidPenalties();
+    final habits = await dbHelper.queryLastWeekHabits();
     await Future.delayed(const Duration(seconds: 1));
     setState(() {
       userHabits = habits;
@@ -50,20 +50,31 @@ class _PenaltyNotPaidPageState extends State<PenaltyNotPaidPage> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Pay the Penalty',
-                    style: AppTextStyles.headline.copyWith(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'View your habits',
+                        style: AppTextStyles.headline.copyWith(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      IconButton(onPressed: ()=>{
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => const PenaltyNotPaidPage()))
+                      }, icon: const Icon(Icons.history, color: Colors.purple ,size: 35,))
+                    ],
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Calculate your points and pay the penalty for habits you missed',
+                    'Look at your habits for this week',
                     style: AppTextStyles.body.copyWith(fontSize: 18),
                   ),
                   const SizedBox(height: 24),
-                  if (isLoading) Expanded(child: MyCircularProgress()),
+                  if (isLoading)
+                    Expanded(
+                      child: MyCircularProgress()
+                    ),
                   if (!isLoading && userHabits.isNotEmpty)
                     Expanded(
                       child: Container(
@@ -75,10 +86,8 @@ class _PenaltyNotPaidPageState extends State<PenaltyNotPaidPage> {
                             final habit = userHabits[index];
                             return HabitCard(
                               habit: habit,
-                              isUnpaidPage: true,
                               onDelete: () async =>
                                   await fetchHabitsFromDatabase(),
-                              onUpdate: () async => await fetchHabitsFromDatabase(),
                             );
                           },
                         ),
@@ -88,10 +97,28 @@ class _PenaltyNotPaidPageState extends State<PenaltyNotPaidPage> {
               ),
               if (!isLoading && userHabits.isEmpty)
                 const Center(
-                  child: NoUnpaidPenaltyPrompt(),
+                  child: NoHabitsPrompt(),
                 ),
             ],
           ),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => AddHabitPage(
+                onHabitAdded: () {
+                  fetchHabitsFromDatabase();
+                },
+              ),
+            ),
+          );
+        },
+        backgroundColor: Colors.purple,
+        child: const Icon(
+          Icons.add,
+          color: AppColors.primary,
         ),
       ),
     );

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:habit_tracker_app/screens/view_habits_page.dart';
+import 'package:habit_tracker_app/pages/activities_dashboard.dart';
+import 'package:habit_tracker_app/pages/homepage/homepage.dart';
+import 'package:habit_tracker_app/pages/onboarding_screen.dart';
+import 'package:habit_tracker_app/pages/view_habits_page.dart';
 import 'package:habit_tracker_app/utils/app_colors.dart';
 import 'package:habit_tracker_app/splash_screen.dart';
-import 'package:habit_tracker_app/screens/add_habit_page.dart';
+import 'package:habit_tracker_app/pages/AddHabitPage/add_habit_page.dart';
 
 void main() {
   runApp(const MyApp());

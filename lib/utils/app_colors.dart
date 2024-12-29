@@ -16,4 +16,5 @@ class AppColors {
       Color(0xFF757575); // Medium gray for secondary text
   static const Color inputBackground =
       Color(0xFFc4c4c4); // Soft light background for input fields
+  static const Color error = Color(0xFFf28b82); 
 }
